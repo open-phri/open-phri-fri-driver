@@ -1,0 +1,1 @@
+set(open-phri-driver-fri_PID_VERSION 2 CACHE INTERNAL "")

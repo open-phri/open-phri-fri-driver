@@ -1,0 +1,17 @@
+robot:
+    name: Kuka LWR4
+    joint_count: 7
+
+model:
+    path: robot_models/kuka_lwr4.yaml
+    control_point: end-effector
+
+driver:
+    type: fri
+    sample_time: 0.01
+    port: 49939 # or 49938
+
+controller:
+    use_dynamic_dls: true
+    lambda_max: 0.1
+    sigma_min_threshold: 0.1
