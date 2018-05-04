@@ -8,10 +8,15 @@ model:
 
 driver:
     type: fri
+    init_timeout: 30
     sample_time: 0.01
-    port: 49939 # or 49938
+    port: 49938 # or 49939
 
 controller:
     use_dynamic_dls: true
     lambda_max: 0.1
     sigma_min_threshold: 0.1
+
+data_logger:
+    log_robot_data: true
+    log_control_data: true

@@ -38,11 +38,11 @@ void sigint_handler(int sig) {
 int main(int argc, char const *argv[]) {
 	PID_EXE(argv[0]);
 
-	auto app = AppMaker("examples_config/fri-driver-example.yaml");
+	AppMaker app("examples_config/fri-driver-example.yaml");
 
 	/***			Controller configuration			***/
 	auto robot = app.getRobot();
-	*robot->controlPointDampingMatrix() *= 100.;
+	*robot->controlPointDampingMatrix() *= 250.;
 
 	auto maximum_velocity = make_shared<double>(0.1);
 

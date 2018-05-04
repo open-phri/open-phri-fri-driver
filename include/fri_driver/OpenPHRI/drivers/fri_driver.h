@@ -77,8 +77,7 @@ public:
 	 * @param timeout The maximum time to wait to establish the connection.
 	 * @return true on success, false otherwise
 	 */
-	virtual bool init(double timeout = 5.) override;
-
+	virtual bool init(double timeout = 30.) override;
 	/**
 	 * @brief Check the state of the connection.
 	 * @return True if the connection is still open, false otherwise.

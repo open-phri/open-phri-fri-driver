@@ -53,7 +53,8 @@ FRIDriver::FRIDriver(
 {
 	assert(robot->jointCount() == 7);
 
-	impl_ = std::make_unique<FRIDriver::pImpl>(sample_time, port);
+	sample_time_ = sample_time;
+	impl_ = std::make_unique<FRIDriver::pImpl>(sample_time_, port);
 }
 
 FRIDriver::FRIDriver(
@@ -65,11 +66,10 @@ FRIDriver::FRIDriver(
 
 	const auto& fri = configuration["driver"];
 
-	double sample_time;
 	int port;
 	if(fri) {
 		try {
-			sample_time = fri["sample_time"].as<double>();
+			sample_time_ = fri["sample_time"].as<double>();
 		}
 		catch(...) {
 			throw std::runtime_error(OPEN_PHRI_ERROR("You must provide a 'sample_time' field in the FRI configuration."));
@@ -85,17 +85,22 @@ FRIDriver::FRIDriver(
 		throw std::runtime_error(OPEN_PHRI_ERROR("The configuration file doesn't include a 'driver' field."));
 	}
 
-	impl_ = std::make_unique<FRIDriver::pImpl>(sample_time, port);
+	impl_ = std::make_unique<FRIDriver::pImpl>(sample_time_, port);
 }
 
 FRIDriver::~FRIDriver() = default;
 
 bool FRIDriver::init(double timeout) {
+	std::cout << "\n";
 	int result = impl_->fri->StartRobotInJointPositionControl(timeout);
-	bool ok = result == EOK;
+	bool ok = (result == EOK);
 
-	if (not ok) {
-		std::cout << "ERROR, could not start Kuka LWR: " << strerror(result) << std::endl;
+	if(ok) {
+		read();
+		ok &= Driver::init(timeout);
+	}
+	else {
+		std::cerr << "[phri::FRIDriver::init] ERROR, could not start Kuka LWR: " << strerror(result) << std::endl;
 	}
 
 	return ok;
@@ -107,9 +112,8 @@ bool FRIDriver::checkConnection() const {
 
 bool FRIDriver::start() {
 	sync();
-	while(not checkConnection());
 
-	std::cout << "Current system state:" << std::endl << impl_->fri->GetCompleteRobotStateAndInformation() << std::endl;
+	std::cout << "\n[phri::FRIDriver::start] Current system state:" << std::endl << impl_->fri->GetCompleteRobotStateAndInformation() << std::endl;
 
 	return checkConnection();
 }
@@ -119,7 +123,7 @@ bool FRIDriver::stop() {
 
 	bool ok = impl_->fri->StopRobot() == EOK;
 	if(not ok) {
-		std::cout << "An error occurred while stopping the Kuka LWR" << std::endl;
+		std::cerr << "[phri::FRIDriver::stop] An error occurred while stopping the Kuka LWR" << std::endl;
 	}
 
 	return ok;
@@ -139,7 +143,7 @@ bool FRIDriver::read() {
 			}
 		}
 		else {
-			std::cout << "Can't get joint positions from FRI" << std::endl;
+			std::cerr << "[phri::FRIDriver::read] Can't get joint positions from FRI" << std::endl;
 			all_ok = false;
 		}
 
@@ -148,7 +152,7 @@ bool FRIDriver::read() {
 				(*robot_->jointExternalTorque())[i] = buffer[i];
 			}
 		else {
-			std::cout << "Can't get external joint torques from FRI" << std::endl;
+			std::cerr << "[phri::FRIDriver::read] Can't get external joint torques from FRI" << std::endl;
 			all_ok = false;
 		}
 
@@ -164,12 +168,12 @@ bool FRIDriver::read() {
 			std::swap(ext_force[3], ext_force[5]);
 		}
 		else {
-			std::cout << "Can't get force sensor values from FRI" << std::endl;
+			std::cerr << "[phri::FRIDriver::read] Can't get force sensor values from FRI" << std::endl;
 			all_ok = false;
 		}
 	}
 	else {
-		std::cout << "The connection to the FRI has been lost" << std::endl;
+		std::cerr << "[phri::FRIDriver::read] The connection to the FRI has been lost" << std::endl;
 		all_ok = false;
 	}
 
@@ -181,19 +185,21 @@ bool FRIDriver::send() {
 
 	if(checkConnection()) {
 		const VectorXd& velocity_vec = *robot_->jointVelocity();
+		VectorXd& position_vec = *robot_->jointTargetPosition();
 
-		*robot_->jointTargetPosition() += velocity_vec*impl_->sample_time;
+		position_vec += velocity_vec*impl_->sample_time;
 
 		// Set joint target positions
-		for (size_t i = 0; i < 7; ++i)
-			buffer[i] = velocity_vec[i];
+		for (size_t i = 0; i < 7; ++i) {
+			buffer[i] = position_vec[i];
+		}
 
 		impl_->fri->SetCommandedJointPositions(buffer);
 
 		return true;
 	}
 	else {
-		std::cout << "The connection to the FRI has been lost" << std::endl;
+		std::cerr << "[phri::FRIDriver::send] The connection to the FRI has been lost" << std::endl;
 		return false;
 	}
 }
