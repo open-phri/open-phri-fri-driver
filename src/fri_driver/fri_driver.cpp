@@ -49,7 +49,7 @@ FRIDriver::FRIDriver(
 	phri::RobotPtr robot,
 	double sample_time,
 	int port) :
-	Driver(robot)
+	Driver(robot, sample_time)
 {
 	assert(robot->jointCount() == 7);
 
@@ -60,7 +60,7 @@ FRIDriver::FRIDriver(
 FRIDriver::FRIDriver(
 	const phri::RobotPtr& robot,
 	const YAML::Node& configuration) :
-	Driver(robot)
+	Driver(robot, 0.)
 {
 	assert(robot->jointCount() == 7);
 
@@ -110,7 +110,7 @@ bool FRIDriver::checkConnection() const {
 	return impl_->fri->IsMachineOK();
 }
 
-bool FRIDriver::start() {
+bool FRIDriver::start(double timeout) {
 	sync();
 
 	std::cout << "\n[phri::FRIDriver::start] Current system state:" << std::endl << impl_->fri->GetCompleteRobotStateAndInformation() << std::endl;

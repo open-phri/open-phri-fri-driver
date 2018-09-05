@@ -88,7 +88,7 @@ public:
 	/**
 	 * @brief Start the simulation.
 	 */
-	virtual bool start() override;
+	virtual bool start(double timeout = 30.) override;
 
 	/**
 	 * @brief Stop the simulation.
