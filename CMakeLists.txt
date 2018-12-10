@@ -14,12 +14,10 @@ declare_PID_Package(
 			YEAR 		    2018
 			LICENSE 	    GNULGPL
 			DESCRIPTION     "An OpenPHRI driver for the Kuka LWR4 robot, based on the Fast Research Interface."
+			VERSION			0.1.0
 )
 
-set_PID_Package_Version(0 1)
-
-#now finding packages
-declare_PID_Package_Dependency(PACKAGE open-phri NATIVE 0.8)
-declare_PID_Package_Dependency(PACKAGE api-driver-fri NATIVE VERSION 1.3)
+PID_Dependency(open-phri VERSION 1.0)
+PID_Dependency(api-driver-fri VERSION 1.3)
 
 build_PID_Package()
