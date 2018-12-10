@@ -23,5 +23,6 @@ data_logger:
 
 parameters:
     damping: [250, 250, 250, 20, 20, 20]
-    deadband: [2, 2, 2, 1, 1, 1]
+    deadband: [5, 5, 5, 1, 1, 1]
     velocity_limit: 10
+    record: true

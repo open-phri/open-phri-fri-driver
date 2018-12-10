@@ -42,20 +42,24 @@ int main(int argc, char const *argv[]) {
 
 	/***			Controller configuration			***/
 	auto robot = app.getRobot();
-	*robot->controlPointDampingMatrix() *= 250.;
+	*robot->controlPointDampingMatrix() = phri::Vector6d(app.getParameter<std::vector<double>>("damping").data());
+	auto deadband_values = std::make_shared<phri::Vector6d>(app.getParameter<std::vector<double>>("deadband").data());
 
-	auto maximum_velocity = make_shared<double>(0.1);
+	auto maximum_velocity = make_shared<double>(app.getParameter<double>("velocity_limit"));
 
 	auto safety_controller = app.getController();
 	safety_controller->add(
 		"velocity constraint",
 		VelocityConstraint(maximum_velocity));
 
-	auto vel_cstr = safety_controller->get<VelocityConstraint>("velocity constraint");
-
 	safety_controller->add(
 		"ext force proxy",
 		ExternalForce(robot));
+
+
+	auto deadband = phri::Deadband<phri::Vector6d>(
+		robot->controlPointExternalForce(),
+		deadband_values);
 
 	bool init_ok = app.init();
 
@@ -67,7 +71,7 @@ int main(int argc, char const *argv[]) {
 	signal(SIGINT, sigint_handler);
 
 	while(init_ok and not _stop) {
-		_stop |= not app.run();
+		_stop |= not app.run([&](){deadband(); return true;});
 	}
 
 	app.stop();
