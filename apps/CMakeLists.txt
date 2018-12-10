@@ -3,7 +3,7 @@ declare_PID_Component(
   NAME fri-driver-example
   DIRECTORY fri-driver-example
   RUNTIME_RESOURCES examples_config
-  DEPENDS open-phri-fri-driver
+  DEPEND open-phri-fri-driver
 )
 
 declare_PID_Component(
@@ -11,5 +11,5 @@ declare_PID_Component(
   NAME record-replay-example
   DIRECTORY record-replay-example
   RUNTIME_RESOURCES examples_config
-  DEPENDS open-phri-fri-driver
+  DEPEND open-phri-fri-driver
 )
