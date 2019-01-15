@@ -100,8 +100,10 @@ public:
 
 	void sync() const;
 
+	static bool isRegisteredInFactory();
+
 private:
-	static bool registered_in_factory;
+	static const bool registered_in_factory;
 
 	struct pImpl;
 	std::unique_ptr<pImpl> impl_;

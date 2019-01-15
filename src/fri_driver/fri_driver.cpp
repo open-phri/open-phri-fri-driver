@@ -33,7 +33,7 @@
 
 using namespace phri;
 
-bool FRIDriver::registered_in_factory = phri::DriverFactory::add<FRIDriver>("fri");
+const bool FRIDriver::registered_in_factory = phri::DriverFactory::add<FRIDriver>("fri");
 
 struct FRIDriver::pImpl {
 	pImpl(double sample_time, int port) :
@@ -206,4 +206,8 @@ bool FRIDriver::send() {
 
 void FRIDriver::sync() const {
 	impl_->fri->WaitForKRCTick();
+}
+
+bool FRIDriver::isRegisteredInFactory() {
+	return registered_in_factory;
 }
