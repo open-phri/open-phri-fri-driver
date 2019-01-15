@@ -1,4 +1,4 @@
-declare_PID_Component(
+PID_Component(
     SHARED_LIB
     NAME open-phri-fri-driver
     DIRECTORY fri_driver

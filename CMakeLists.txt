@@ -5,7 +5,7 @@ include(Package_Definition NO_POLICY_SCOPE)
 
 PROJECT(open-phri-fri-driver)
 
-declare_PID_Package(
+PID_Package(
 			AUTHOR 		    Benjamin Navarro
 			INSTITUTION	    LIRMM
 			MAIL		    navarro@lirmm.fr

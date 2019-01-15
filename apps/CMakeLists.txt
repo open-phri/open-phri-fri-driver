@@ -1,4 +1,4 @@
-declare_PID_Component(
+PID_Component(
   EXAMPLE_APPLICATION
   NAME fri-driver-example
   DIRECTORY fri-driver-example
@@ -6,7 +6,7 @@ declare_PID_Component(
   DEPEND open-phri-fri-driver
 )
 
-declare_PID_Component(
+PID_Component(
   EXAMPLE_APPLICATION
   NAME record-replay-example
   DIRECTORY record-replay-example
